@@ -1,6 +1,7 @@
 use std::io;
 use std::fs;
 use std::process;
+use std::thread;
 
 fn file_path() -> String
 {
@@ -33,7 +34,11 @@ fn main(){
         match option.trim().parse::<u32>(){
             Ok(1) => println!("The file data is: {:?}", data),
             Ok(2) => println!("i'll add this option soon."),
-            Ok(3) => process::exit(0),
+            Ok(3) => {
+                println!("Exiting the program...");
+                thread::sleep(std::time::Duration::from_secs(1));
+                process::exit(0);
+            }
             _ => println!("Invalid option"),
         }
     }

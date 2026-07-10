@@ -22,7 +22,7 @@ fn file_to_bytes(path: String) -> Vec<u8>
 fn main(){
     let path = file_path();
     let data = file_to_bytes(path);
-    println!("Find a File with size {}" , data.len());
+    println!("Find a File with size {} byte" , data.len());
     println!("What option do you want?");
     println!("1. Read the bytes of the file");
     println!("2. Write the bytes of the file");

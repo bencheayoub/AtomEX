@@ -86,7 +86,10 @@ fn show_line(data: &[u8], line: usize) -> String
     }
 }
 
-fn show_lines(data: &[u8], offset: usize, count: usize) -> String
+fn show_lines(data: &[u8],
+    offset: usize,
+    count: usize)
+    -> String
 {
     let mut output = String::new();
     for i in 0..count {
@@ -126,8 +129,25 @@ fn hex_dump(data: &[u8]) -> String
 }
 
 // Write on the file.
-fn write_bytes_to_file(path: &str, data: &[u8]) {
-    bytes: Vec<u8> = file_to_bytes(&path);
+fn write_bytes_to_file(path: &str,
+    line: usize,
+    offset: usize,
+    size_of_data: usize,
+    data: &[u8]) 
+    -> Result<(), io::Error>{
+    let mut bytes = fs::read(path)?;
+    let line_offset = line / 10 * 16;
+    let offset_to_edit = start_offset + offset;
+
+    if data.len() != size_of_data{
+        println!("Whether your data is more or less then the size of data please make sure about these information.");
+    } else {
+        for (i, &byte) in (size_of_data , data.iter().enumerate()){
+            bytes[offset_to_edit + i] = byte;
+        }
+        fs::write(path, bytes)?;
+        println!("Successfully wrote {} bytes at offset 0x{:x} (line {}, offset {})", new_data.len(), offset_to_edit, line, offse);
+    }
 }
 
 // Main function.
@@ -159,7 +179,8 @@ fn main(){
             Ok(4) => { println!("i'll add this option soon.");
             }
             Ok(5) => {
-                println!("what is the offset of the file you want to show?");
+                println!("what is the line of the file you want to show?");
+                println!("eg: 08 for 0x80.")
                 let mut offset_input = String::new();
                 io::stdin().read_line(&mut offset_input).expect("Failed to read line");
                 let offset = offset_input.trim().parse::<usize>().unwrap_or(0);

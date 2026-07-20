@@ -44,9 +44,14 @@ fn bytes_to_hex(data: &[u8]) -> String
     .join(" ")
 }
 
-fn show_line(data: &[u8], offset: usize) -> String
+fn show_line(data: &[u8], line: usize) -> String
 {
-    let offset = line * 16; 
+    if line % 10 != 0 {
+        println!("There is no offset of {}. The offset number must be a multiple of 10.", line);
+        return String::new();
+    }
+    
+    let offset = line / 10 * 16;
     if offset > data.len() {
         println!("Offset is out of bounds.");
         return String::new();
@@ -120,6 +125,11 @@ fn hex_dump(data: &[u8]) -> String
     dump
 }
 
+// Write on the file.
+fn write_bytes_to_file(path: &str, data: &[u8]) {
+    bytes: Vec<u8> = file_to_bytes(&path);
+}
+
 // Main function.
 fn main(){
     let path = file_path();
@@ -132,14 +142,16 @@ fn main(){
         println!("2. Write the bytes of the file.");
         println!("3. Hex dump of the file.");
         println!("4. Search for a specific offset.");
-        println!("5, show lines of the file.");
+        println!("5. Show lines of the file.");
         println!("6. Show a specific line of the file.");
         println!("7. Exit the program.");
         option.clear();
         io::stdin().read_line(&mut option).expect("Failed to read line");
         match option.trim().parse::<u32>(){
             Ok(1) => println!("The file data is: {:?}", data),
-            Ok(2) => println!("i'll add this option soon."),
+            Ok(2) => {
+                println!("what are the data you want to ")
+            }
             Ok(3) => { 
                 let dump = hex_dump(&data);
                 println!("the hex dump of the file is: \n{}", dump); 

@@ -216,7 +216,6 @@ fn main(){
                 };
 
                 // read the size of data.
-                println!("what is the size of data. 1 == byte.");
                 let mut size_of_data = new_bytes.len();
 
                 // use the function.

@@ -137,7 +137,7 @@ fn write_bytes_to_file(path: &str,
     -> Result<(), io::Error>{
 
         let mut bytes = fs::read(path)?;
-        let line_offset = line / 10 * 16;
+        let line_offset = (line - 1) * 16 - 1;
         let offset_to_edit = line_offset + offset;
 
         if data.len() != size_of_data {
@@ -170,7 +170,7 @@ fn parse_hex_bytes(input: &str) -> Option<Vec<u8>> {
 // Main function.
 fn main(){
     let path = file_path();
-    let data = file_to_bytes(&path);
+    let mut data = file_to_bytes(&path);
     println!("Find a File with size {} byte." , data.len());
     let mut option = String::new();
     loop {
@@ -222,7 +222,7 @@ fn main(){
                 // use the function.
                 match write_bytes_to_file(&path, line, offset, size_of_data, &new_bytes){
                     Ok(()) =>{
-                        let mut data = file_to_bytes(&path);
+                        data = file_to_bytes(&path);
                     }
                     Err(e) => println!("Failed to write to file: {}", e)
                 };

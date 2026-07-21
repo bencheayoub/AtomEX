@@ -82,7 +82,6 @@ fn show_line(data: &[u8], line: usize) -> String
 
         output.push_str(&format!("{:08x} {} {}\n", start, hex_padded, ascii_part));
         output
-
     }
 }
 
@@ -135,19 +134,31 @@ fn write_bytes_to_file(path: &str,
     size_of_data: usize,
     data: &[u8]) 
     -> Result<(), io::Error>{
-    let mut bytes = fs::read(path)?;
-    let line_offset = line / 10 * 16;
-    let offset_to_edit = start_offset + offset;
 
-    if data.len() != size_of_data{
-        println!("Whether your data is more or less then the size of data please make sure about these information.");
-    } else {
-        for (i, &byte) in (size_of_data , data.iter().enumerate()){
+        let mut bytes = fs::read(path)?;
+        let line_offset = line / 10 * 16;
+        let offset_to_edit = line_offset + offset;
+
+        if data.len() != size_of_data {
+            println!("Data length ({}) doesn't match the expected size ({}). Aborting write.", data.len(), size_of_data);
+            return Ok(())
+        } 
+        
+        if offset_to_edit + data.len () > bytes.len() {
+            println!("Write would go out of bounds of the file. Aborting.");
+            return Ok(());
+        }
+
+
+        for (i, &byte) in data.iter().enumerate(){
             bytes[offset_to_edit + i] = byte;
         }
-        fs::write(path, bytes)?;
-        println!("Successfully wrote {} bytes at offset 0x{:x} (line {}, offset {})", new_data.len(), offset_to_edit, line, offse);
-    }
+        let mut edited_file = String::new();
+        io::stdin().read_line(&mut edited_file).expect("Failed to read line.");
+        fs::write(edited_file, bytes)?;
+        println!("Successfully wrote {} bytes at offset 0x{:x} (line {}, offset {}.)", data.len(), offset_to_edit, line, offset);
+        Ok(())
+        
 }
 
 // Main function.
@@ -161,16 +172,38 @@ fn main(){
         println!("1. Read the bytes of the file.");
         println!("2. Write the bytes of the file.");
         println!("3. Hex dump of the file.");
-        println!("4. Search for a specific offset.");
-        println!("5. Show lines of the file.");
-        println!("6. Show a specific line of the file.");
-        println!("7. Exit the program.");
+        println!("4. Show lines of the file.");
+        println!("5. Show a specific line of the file.");
+        println!("6. Exit the program.");
         option.clear();
-        io::stdin().read_line(&mut option).expect("Failed to read line");
+        io::stdin().read_line(&mut option).expect("Failed to read line.");
         match option.trim().parse::<u32>(){
             Ok(1) => println!("The file data is: {:?}", data),
             Ok(2) => {
-                println!("what are the data you want to ")
+                // read the line.
+                let mut line = String::new();
+                println!("what is the line u wanna edit?");
+                io::stdin().read_line(&mut line).expect("Failed to read the line.");
+                let line: usize = line.parse().unwrap();
+                // read the offset.
+                println!("What is the offset of the byte you wanna edit?");
+                println!("e.g: \"enter 4 to modify the byter \'6d'\" 6672 6f6d 2043 7279 7074 6f2e 5574 696c");
+                let mut offset = String::new();
+                io::stdin().read_line(&mut offset).expect("Failed to read the offset.");
+                let offset: usize = offset.parse().unwarp();
+                // read the size of data.
+                println!("what is the size of data. 1 == byte.");
+                let mut size_of_data = String::new();
+                io::stdin().read_line(&mut size_of_data).expect("Failed to read the size of data.");
+                let size_of_data: usize = size_of_data.parse().unwrap();
+                // read the new data.
+                println!("Enter the new data.");
+                let mut data = String::new();
+                io::stdin().read_line(&mut data).expect(Failed to read the new data.);
+                let mut buffer = [0; 32];
+                let mut new_data: &mut[u8] = &mut buffer;
+                new_data.write(data.as_bytes()).unwrap();
+                write_bytes_to_file(line, offset, size_of_data, data);
             }
             Ok(3) => { 
                 let dump = hex_dump(&data);
@@ -180,7 +213,7 @@ fn main(){
             }
             Ok(5) => {
                 println!("what is the line of the file you want to show?");
-                println!("eg: 08 for 0x80.")
+                println!("eg: 08 for 0x80.");
                 let mut offset_input = String::new();
                 io::stdin().read_line(&mut offset_input).expect("Failed to read line");
                 let offset = offset_input.trim().parse::<usize>().unwrap_or(0);
@@ -207,6 +240,5 @@ fn main(){
             _ => println!("Invalid option. Please enter a number between 1 and 7."),
         }
     }
-
 }
 

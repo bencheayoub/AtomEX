@@ -45,15 +45,14 @@ fn bytes_to_hex(data: &[u8]) -> String
     .join(" ")
 }
 
-fn show_line(data: &[u8], line: usize) -> String
-{
-    if line % 10 != 0 {
-        println!("There is no offset of {}. The offset number must be a multiple of 10.", line);
+fn show_line(data: &[u8], offset: usize) -> String
+{   
+    if offset % 16 != 0 {
+        println!("There is no offset of {}. The offset number must be a multiple of 16.", offset);
         return String::new();
     }
-    
-    let offset = line / 10 * 16;
-    if offset > data.len() {
+
+    if offset >= data.len() {
         println!("Offset is out of bounds.");
         return String::new();
     } else {
@@ -137,8 +136,8 @@ fn write_bytes_to_file(path: &str,
     -> Result<(), io::Error>{
 
         let mut bytes = fs::read(path)?;
-        let line_offset = (line - 1) * 16 - 1;
-        let offset_to_edit = line_offset + offset;
+        let line_offset = (line - 1) * 16;
+        let offset_to_edit = line_offset + offset - 1;
 
         if data.len() != size_of_data {
             println!("Data length ({}) doesn't match the expected size ({}). Aborting write.", data.len(), size_of_data);
@@ -187,14 +186,17 @@ fn main(){
             Ok(1) => println!("The file data is: {:?}", data),
             Ok(2) => {
                 // read the line.
-                let mut line = String::new();
-                println!("what is the line u wanna edit?");
-                io::stdin().read_line(&mut line).expect("Failed to read the line.");
-                let line: usize = match line.trim().parse() {
-                    Ok(v) => v,
-                    Err(_) => { println!("That's noa a valind number."); continue;}
+                let mut line_input = String::new();
+                let line = loop {
+                    println!("what is the line u wanna edit?");
+                    line_input.clear();
+                    io::stdin().read_line(&mut line_input).expect("Failed to read the line.");
+                    match line_input.trim().parse::<usize>() {
+                        Ok(v) if v!= 0 => break v,
+                        Ok(_) => println!("Line number cannot be 0."),
+                        Err(_) => { println!("That's noa a valind number."); continue;}
+                    };
                 };
-
                 // read the offset.
                 println!("What is the offset of the byte you wanna edit?");
                 println!("e.g: \"enter 4 to modify the byter \'6d'\" 6672 6f6d 2043 7279 7074 6f2e 5574 696c");
@@ -216,7 +218,7 @@ fn main(){
                 };
 
                 // read the size of data.
-                let mut size_of_data = new_bytes.len();
+                let size_of_data = new_bytes.len();
 
                 // use the function.
                 match write_bytes_to_file(&path, line, offset, size_of_data, &new_bytes){
@@ -236,7 +238,9 @@ fn main(){
                 println!("eg: 08 for 0x80.");
                 let mut offset_input = String::new();
                 io::stdin().read_line(&mut offset_input).expect("Failed to read line");
-                let offset = offset_input.trim().parse::<usize>().unwrap_or(0);
+                let input = offset_input.trim();
+                let input = input.strip_prefix("0x").unwrap_or(input);
+                let offset = usize::from_str_radix(input, 16).unwrap_or(0);
                 println!("how many lines do you want to show?");
                 let mut count_input = String::new();
                 io::stdin().read_line(&mut count_input).expect("Failed to read line");
@@ -248,7 +252,9 @@ fn main(){
                 println!("what is the offset of the file you want to show?");
                 let mut offset_input = String::new();
                 io::stdin().read_line(&mut offset_input).expect("Failed to read line");
-                let offset = offset_input.trim().parse::<usize>().unwrap_or(0);
+                let input = offset_input.trim();
+                let input = input.strip_prefix("0x").unwrap_or(input);
+                let offset = usize::from_str_radix(input, 16).unwrap_or(0);
                 let line = show_line(&data, offset);
                 println!("the line of the file is: \n{}", line);
             }

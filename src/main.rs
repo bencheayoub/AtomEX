@@ -1,8 +1,10 @@
+mod data;
+
 use std::io;
 use std::fs;
 use std::process;
 use std::thread;
-
+use data::ascii::art;
 
 
 // Function to get the file path from the user.
@@ -17,10 +19,9 @@ fn file_path() -> String
 }
 
 // Function to read the file and return its contents as a vector of bytes.
-fn file_to_bytes(path: &str) -> Vec<u8>
+fn file_to_bytes(path: &str) -> Result<Vec<u8>, io::Error>
 {
-    let data = fs::read(path).expect("Unable to read file");
-    data
+    fs::read(path)
 }
 
 // Function to convert bytes to an ASCII string representation.
@@ -168,8 +169,18 @@ fn parse_hex_bytes(input: &str) -> Option<Vec<u8>> {
 
 // Main function.
 fn main(){
+    println!("{}", art);
     let path = file_path();
-    let mut data = file_to_bytes(&path);
+    let (path, mut data) = loop {
+        let path = file_path();
+        match file_to_bytes(&path){
+            Ok(data) => break (path, data),
+            Err(e) => {
+                println!("Couldn't open the file: {}.", e);
+                println!("Please try again.");
+            }
+        }
+    };
     println!("Find a File with size {} byte." , data.len());
     let mut option = String::new();
     loop {
@@ -223,7 +234,10 @@ fn main(){
                 // use the function.
                 match write_bytes_to_file(&path, line, offset, size_of_data, &new_bytes){
                     Ok(()) =>{
-                        data = file_to_bytes(&path);
+                        match file_to_bytes(&path){
+                            Ok(bytes) => data = bytes,
+                            Err(e) => println!("Failed te reload the file: {}.", e),
+                        }
                     }
                     Err(e) => println!("Failed to write to file: {}", e)
                 };

@@ -52,13 +52,13 @@ fn main(){
                 // read the line.
                 let mut line_input = String::new();
                 let line = loop {
-                    println!("what is the line u wanna edit?");
+                    println!("what is the line you wanna edit?");
                     line_input.clear();
                     io::stdin().read_line(&mut line_input).expect("Failed to read the line.");
                     match line_input.trim().parse::<usize>() {
                         Ok(v) if v!= 0 => break v,
                         Ok(_) => println!("Line number cannot be 0."),
-                        Err(_) => { println!("That's noa a valind number."); continue;}
+                        Err(_) => { println!("That's not a valind number."); continue;}
                     };
                 };
                 // read the offset.

@@ -63,7 +63,7 @@ fn main(){
                 };
                 // read the offset.
                 println!("What is the offset of the byte you wanna edit?");
-                println!("e.g: \"enter 4 to modify the byter \'6d'\" 6672 6f6d 2043 7279 7074 6f2e 5574 696c");
+                println!("e.g: \"enter 4 to modify the bytes \'6d'\" 6672 6f6d 2043 7279 7074 6f2e 5574 696c");
                 let mut offset = String::new();
                 io::stdin().read_line(&mut offset).expect("Failed to read the offset.");
                 let offset: usize = match offset.trim().parse() {
@@ -72,8 +72,8 @@ fn main(){
                 };
                 
                 // read the new data.
-                println!("Enter the new data as space-separeted hex.");
-                println!("e.g: \"48 65 6c 6c 6f\" .");
+                println!("Enter the new data as space-separated hex.");
+                println!("e.g: \"48 65 6c 6c 6f\".");
                 let mut data_input = String::new();
                 io::stdin().read_line(&mut data_input).expect("Failed to read the new data.");
                 let new_bytes = match parse_hex_bytes(data_input.trim()){
@@ -89,7 +89,7 @@ fn main(){
                     Ok(()) =>{
                         match file_to_bytes(&path){
                             Ok(bytes) => data = bytes,
-                            Err(e) => println!("Failed te reload the file: {}.", e),
+                            Err(e) => println!("Failed to reload the file: {}.", e),
                         }
                     }
                     Err(e) => println!("Failed to write to file: {}", e)
@@ -130,7 +130,7 @@ fn main(){
                 thread::sleep(std::time::Duration::from_secs(1));
                 process::exit(0);
             }
-            _ => println!("Invalid option. Please enter a number between 1 and 7."),
+            _ => println!("Invalid option. Please enter a number between 1 and 6."),
         }
     }
 }

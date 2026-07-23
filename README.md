@@ -1,102 +1,228 @@
 # AtomEX
 
-## 🚧 Project Status: Under Development
+> **A modern, high-performance hex editor written in Rust.**
 
-AtomEX is currently an active work-in-progress project. It is not finished yet, and many planned features are still being implemented. The current version focuses on building the core foundations, experimenting with Rust systems programming concepts, and gradually evolving toward a complete graphical hex editor.
+AtomEX is an open-source project focused on building a fast, reliable, and modern hexadecimal editor for binary file analysis and editing. The project is being developed from scratch as a way to deeply explore Rust systems programming while creating a practical reverse-engineering tool.
 
+It allows binary files to be viewed and edited at the byte level through hexadecimal and ASCII representations, with a long-term goal of providing a professional graphical interface comparable to established hex editors.
 
-A modern, high-performance graphical hex editor built in Rust.
+---
 
-AtomEX lets you view, navigate, and edit binary data directly — displaying files
-as raw bytes in both hexadecimal and ASCII form. It's built for programmers,
-reverse engineers, and anyone who needs to work at the byte level with
-executables, firmware images, and other binary formats.
+# 🚧 Project Status
 
-This project is developed as a hands-on learning exercise in systems
-programming with Rust: file I/O, memory management, binary data
-representation, and GUI development from the ground up.
+AtomEX is currently under active development.
 
-## Status
+The project has successfully completed its initial command-line implementation and is now entering the **GUI development phase**. Core file manipulation features have been implemented, providing a solid foundation before moving to a graphical interface.
 
-🚧 Early development — currently a CLI prototype for core file-reading logic.
-GUI work has not started yet.
+Although many advanced capabilities are still planned, the project is already capable of reading, navigating, displaying, and modifying binary files directly.
 
-## Features
+---
 
-### Planned
+# Current Features
 
-- **Binary visualization**
-  - Hex + ASCII side-by-side view
-  - Efficient navigation through large files
-  - Offset tracking and "go to address"
+### File Handling
 
-- **Editing**
-  - Overwrite, insert, and delete bytes
-  - Undo / redo
-  - Save with file integrity preserved
+* Open binary files
+* Load entire files into memory
+* Reload modified files automatically
+* Error handling for invalid paths and I/O failures
 
-- **GUI**
-  - Cross-platform, responsive interface
-  - Workflow inspired by professional reverse-engineering tools
+### Hex Viewer
 
-- **Analysis tools**
-  - Byte pattern / string search
-  - Data inspector (interpret bytes as int8/16/32/float, endianness toggle)
-  - Basic file-format highlighting (e.g. PE/ELF headers)
+* Complete hexadecimal dump
+* Hexadecimal + ASCII representation
+* Configurable line display
+* Display individual lines by offset
+* Automatic formatting with offsets
 
-### Implemented
+Example:
 
-- Read a file path from user input
-- Load file contents into memory
-- CLI menu skeleton (read / write / exit)
+```text
+00000000  4d 5a 90 00 03 00 00 00 04 00 00 00 ff ff 00 00  MZ..............
+00000010  b8 00 00 00 00 00 00 00 40 00 00 00 00 00 00 00  ........@.......
+```
 
-## Tech Stack
+### Editing
 
-- **Language:** Rust — memory safety, performance, and a strong fit for
-  low-level binary manipulation
-- **GUI framework:** TBD (currently evaluating `egui` for its immediate-mode
-  rendering, which suits a scrollable byte-grid view)
+* Edit arbitrary bytes
+* Write hexadecimal values directly
+* Automatic validation of hexadecimal input
+* Bounds checking
+* Prevent out-of-range writes
+* Automatic file reload after modification
 
-## Architecture Notes
+### Navigation
 
-Large binary files (firmware dumps, disk images, executables) won't fit
-comfortably as a single in-memory buffer forever. The long-term plan is to
-move from a naive `Vec<u8>` file buffer to a **piece table** structure —
-keeping the original file untouched on disk/mmap and recording edits as an
-overlay — to support efficient insert/delete and large-file editing without
-rewriting the whole file on every change.
+* View specific offsets
+* View multiple consecutive lines
+* Offset parsing using hexadecimal notation (`0x80`, `100`, etc.)
 
-## Goals
+### Utility
 
-This project exists as much for the learning as for the tool itself. Areas of
-focus:
+* Hexadecimal parser
+* ASCII conversion
+* Hexadecimal formatting helpers
+* Clean CLI menu system
 
-- File I/O and binary manipulation in Rust
-- Memory management and ownership in a systems context
-- Data representation at the byte level
-- GUI development for data-dense interfaces
-- Reverse-engineering workflows and tooling
+---
 
-## Getting Started
+# Planned Features
+
+## Graphical User Interface
+
+* Modern desktop interface
+* Dockable panels
+* Multiple opened files
+* Dark and light themes
+* Responsive layout
+* Keyboard shortcuts
+* Context menus
+
+---
+
+## Hex Editing
+
+* Insert bytes
+* Delete bytes
+* Overwrite mode
+* Undo / Redo
+* Clipboard support
+* Find & Replace
+
+---
+
+## Navigation
+
+* Go to Offset
+* Jump history
+* Address bookmarks
+* Byte selection
+* Keyboard navigation
+
+---
+
+## Search
+
+* Search hexadecimal values
+* Search ASCII strings
+* Unicode search
+* Pattern search
+* Highlight results
+
+---
+
+## Data Inspector
+
+Interpret selected bytes as:
+
+* int8 / int16 / int32 / int64
+* uint8 / uint16 / uint32 / uint64
+* float32
+* float64
+* ASCII
+* UTF-8
+* UTF-16
+
+with little-endian and big-endian support.
+
+---
+
+## Reverse Engineering Features
+
+* PE parsing
+* ELF parsing
+* Header highlighting
+* Entropy visualization
+* Strings extraction
+* Structure viewer
+
+---
+
+## Large File Support
+
+Future versions will replace the current in-memory buffer with more efficient data structures.
+
+Planned improvements include:
+
+* Piece Table
+* Memory-Mapped Files (mmap)
+* Lazy loading
+* Efficient editing of multi-gigabyte files
+
+---
+
+# Technology
+
+| Component         | Technology         |
+| ----------------- | ------------------ |
+| Language          | Rust               |
+| Current Interface | Command-Line (CLI) |
+| Planned GUI       | egui               |
+| File Handling     | std::fs            |
+| Build System      | Cargo              |
+
+---
+
+# Project Goals
+
+AtomEX is both a practical application and a learning project designed to deepen understanding of:
+
+* Rust ownership and borrowing
+* Systems programming
+* Binary file manipulation
+* Memory management
+* File I/O
+* Data structures
+* GUI application development
+* Reverse engineering fundamentals
+
+---
+
+# Roadmap
+
+* [x] Project setup
+* [x] File loading
+* [x] Hexadecimal dump
+* [x] ASCII visualization
+* [x] Offset display
+* [x] Display specific lines
+* [x] Display multiple lines
+* [x] Hexadecimal parser
+* [x] Binary editing
+* [x] Write changes back to file
+* [x] Input validation
+* [ ] GUI foundation
+* [ ] Hex grid widget
+* [ ] Byte selection
+* [ ] Keyboard navigation
+* [ ] Undo / Redo
+* [ ] Search
+* [ ] Data inspector
+* [ ] Large file support
+* [ ] Piece Table implementation
+* [ ] Reverse engineering tools
+
+---
+
+# Getting Started
 
 ```bash
-git clone <repo-url>
-cd atomex
+git clone https://github.com/bencheayoub/AtomEX.git
+
+cd AtomEX
+
 cargo run
 ```
 
-> Requires a recent stable Rust toolchain (`rustup` recommended).
+Requirements:
 
-## Roadmap
+* Latest stable Rust
+* Cargo
 
-1. CLI hex dumper (hex + ASCII output, no GUI)
-2. GUI framework fundamentals (isolated prototypes)
-3. Static hex/ASCII grid view (read-only)
-4. Byte selection and keyboard navigation
-5. In-memory editing (small files)
-6. Undo / redo
-7. Insert / delete support
-8. Piece table for efficient editing
-9. Large file support (memory-mapped I/O)
-10. Reverse-engineering features (search, data inspector, format highlighting)
-11. Polish (themes, shortcuts, recent files)
+---
+
+# Vision
+
+The long-term objective of AtomEX is to become a professional, cross-platform hexadecimal editor capable of handling very large binary files efficiently while remaining lightweight, responsive, and entirely written in safe Rust wherever practical.
+
+The current CLI implementation establishes the project's core editing engine, while upcoming development will focus on building a polished graphical interface and expanding reverse-engineering capabilities.

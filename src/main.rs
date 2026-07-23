@@ -1,171 +1,24 @@
 mod data;
+mod editor;
+mod hex;
+mod file;
+mod parser;
+mod view;
+
 
 use std::io;
 use std::fs;
 use std::process;
 use std::thread;
 use data::ascii::art;
+use file::file_path;
+use hex::file_to_bytes;
+use hex::hex_dump;
+use view::show_lines;
+use view::show_line;
+use parser::parse_hex_bytes;
+use editor::write_bytes_to_file;
 
-
-// Function to get the file path from the user.
-fn file_path() -> String
-{
-    println!("Enter the file path: ");
-    let mut path = String::new();
-    io::stdin().read_line(&mut path).expect("Failed to read line.");
-    let path = path.trim().to_string();
-    println!("The file path is: {} .", path);
-    path
-}
-
-// Function to read the file and return its contents as a vector of bytes.
-fn file_to_bytes(path: &str) -> Result<Vec<u8>, io::Error>
-{
-    fs::read(path)
-}
-
-// Function to convert bytes to an ASCII string representation.
-fn bytes_to_ascii(data: &[u8]) -> String
-{
-    data.iter()
-    .map(|&b| {
-        if b>= 32 && b <= 126 {
-            b as char
-        } else {
-            '.'
-        }
-    }).collect()
-}
-
-// Function to convert bytes to a hex string representation.
-fn bytes_to_hex(data: &[u8]) -> String
-{
-    data.iter()
-    .map(|b| format!("{:02x}", b))
-    .collect::<Vec<String>>()
-    .join(" ")
-}
-
-fn show_line(data: &[u8], offset: usize) -> String
-{   
-    if offset % 16 != 0 {
-        println!("There is no offset of {}. The offset number must be a multiple of 16.", offset);
-        return String::new();
-    }
-
-    if offset >= data.len() {
-        println!("Offset is out of bounds.");
-        return String::new();
-    } else {
-        let start = offset;
-        let end = std::cmp::min(start + 16, data.len());
-        let mut output = String::new();
-        // the hex part of the line.
-        let hex_parts: Vec<String> = data[start..end]
-        .iter()
-        .map(|b| format!("{:02x}", b))
-        .collect();
-
-        let hex_line = hex_parts.join(" ");
-        let hex_padded = format!("{:<48}", hex_line);
-
-        // the ascii part of the line.
-        let ascii_part = data[start..end]
-        .iter()
-        .map(|&b| {
-            if b >= 32 && b <= 126 {
-                b as char
-            } else {
-                '.'
-            }
-        })
-        .collect::<String>();
-
-        output.push_str(&format!("{:08x} {} {}\n", start, hex_padded, ascii_part));
-        output
-    }
-}
-
-fn show_lines(data: &[u8],
-    offset: usize,
-    count: usize)
-    -> String
-{
-    let mut output = String::new();
-    for i in 0..count {
-        let current_offset = offset + i * 16;
-        if current_offset >= data.len() {
-            break;
-        }
-        output.push_str(&show_line(data, current_offset));
-    }
-    output
-}
-
-
-// Function to create a hex dump of the file data.
-fn hex_dump(data: &[u8]) -> String
-{
-    let hex= bytes_to_hex(data);
-    let ascii = bytes_to_ascii(data);
-
-    let hex_parts: Vec<&str> = hex.split_whitespace().collect();
-    let ascii_parts: Vec<char> = ascii.chars().collect();
-
-    let mut dump = String::new();
-    let chunk_size = 16;
-    for i in 0..(data.len() +chunk_size - 1) /chunk_size{
-        let start = i * chunk_size;
-        let end = std::cmp::min(start + chunk_size, data.len());
-        
-        let hex_chunk = hex_parts[start .. end].join(" ");
-        let hex_padded = format!("{:<48}", hex_chunk);
-
-        let ascii_chunk:String  = ascii_parts[start .. end].iter().collect();
-        let line = format!("{:08x} {} {}\n", start, hex_padded, ascii_chunk);
-        dump.push_str(&line);
-    }
-    dump
-}
-
-// Write on the file.
-fn write_bytes_to_file(path: &str,
-    line: usize,
-    offset: usize,
-    size_of_data: usize,
-    data: &[u8]) 
-    -> Result<(), io::Error>{
-
-        let mut bytes = fs::read(path)?;
-        let line_offset = (line - 1) * 16;
-        let offset_to_edit = line_offset + offset - 1;
-
-        if data.len() != size_of_data {
-            println!("Data length ({}) doesn't match the expected size ({}). Aborting write.", data.len(), size_of_data);
-            return Ok(())
-        } 
-        
-        if offset_to_edit + data.len () > bytes.len() {
-            println!("Write would go out of bounds of the file. Aborting.");
-            return Ok(());
-        }
-
-
-        for (i, &byte) in data.iter().enumerate(){
-            bytes[offset_to_edit + i] = byte;
-        }
-        fs::write(path, bytes)?;
-        println!("Successfully wrote {} bytes at offset 0x{:x} (line {}, offset {}.)", data.len(), offset_to_edit, line, offset);
-        Ok(())
-        
-}
-
-fn parse_hex_bytes(input: &str) -> Option<Vec<u8>> {
-    input
-    .split_whitespace()
-    .map(|tok| u8::from_str_radix(tok, 16).ok())
-    .collect()
-}
 
 // Main function.
 fn main(){

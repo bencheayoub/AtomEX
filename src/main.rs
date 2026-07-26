@@ -10,7 +10,7 @@ use std::io;
 use std::fs;
 use std::process;
 use std::thread;
-use data::ascii::art;
+use data::ascii::ART;
 use file::file_path;
 use hex::file_to_bytes;
 use hex::hex_dump;
@@ -22,7 +22,7 @@ use editor::write_bytes_to_file;
 
 // Main function.
 fn main(){
-    println!("{}", art);
+    println!("{}", ART);
     let path = file_path();
     let (path, mut data) = loop {
         let path = file_path();

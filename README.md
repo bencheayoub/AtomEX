@@ -11,7 +11,6 @@ It allows binary files to be viewed and edited at the byte level through hexadec
 # 🚧 Project Status
 
 AtomEX is currently under active development.
-
 The project has successfully completed its initial command-line implementation and is now entering the **GUI development phase**. Core file manipulation features have been implemented, providing a solid foundation before moving to a graphical interface.
 
 Although many advanced capabilities are still planned, the project is already capable of reading, navigating, displaying, and modifying binary files directly.

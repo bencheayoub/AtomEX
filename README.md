@@ -18,6 +18,7 @@ Although many advanced capabilities are still planned, the project is already ca
 
 ---
 
+
 # Current Features
 
 ### File Handling

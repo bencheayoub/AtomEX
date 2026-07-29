@@ -7,7 +7,7 @@ pub fn write_bytes_to_file(path: &str,
     offset: usize,
     size_of_data: usize,
     data: &[u8]) 
-    -> Result<(), io::Error>{
+    -> Result<(), io::Error> {
         let mut bytes = fs::read(path)?;
         let line_offset = (line - 1) * 16;
         let offset_to_edit = line_offset + offset - 1;

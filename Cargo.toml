@@ -4,3 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+egui = "0.28"
+eframe = "0.28"
+hex = "0.4"

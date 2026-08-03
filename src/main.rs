@@ -1,3 +1,4 @@
+// mods.
 mod data;
 mod editor;
 mod hex;
@@ -5,17 +6,17 @@ mod file;
 mod parser;
 mod view;
 
-
+// imports from rust.
 use std::io;
 use std::fs;
 use std::process;
 use std::thread;
+
+// imports from crate.
 use data::ascii::ART;
 use file::file_path;
-use hex::file_to_bytes;
-use hex::hex_dump;
-use view::show_lines;
-use view::show_line;
+use hex::{file_to_bytes, hex_dump};
+use view::{show_lines, show_line};
 use parser::parse_hex_bytes;
 use editor::write_bytes_to_file;
 

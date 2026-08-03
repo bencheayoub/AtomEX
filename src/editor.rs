@@ -22,7 +22,6 @@ pub fn write_bytes_to_file(path: &str,
             return Ok(());
         }
 
-
         for (i, &byte) in data.iter().enumerate(){
             bytes[offset_to_edit + i] = byte;
         }

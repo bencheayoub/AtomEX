@@ -4,12 +4,6 @@ use egui::{Color32, RichText, Rounding, Stroke};
 use std::fs;
 use std::path::PathBuf;
 
-// ---------------------------------------------------------------------
-// Theme
-// ---------------------------------------------------------------------
-// Centralised palette so the whole app stays visually consistent and it's
-// easy to tweak later. Values were picked to match the AtomEX mockups
-// (deep charcoal/navy background, bright blue/cyan accents).
 
 mod theme {
     use egui::Color32;
@@ -17,19 +11,14 @@ mod theme {
     pub const BG_APP: Color32 = Color32::from_rgb(16, 18, 26);
     pub const BG_PANEL: Color32 = Color32::from_rgb(21, 24, 34);
     pub const BG_PANEL_ALT: Color32 = Color32::from_rgb(25, 29, 41);
-    // NOTE: this must be a fully-opaque, solid color. An earlier version used a
-    // translucent white (`from_rgba_premultiplied(255, 255, 255, 4)`), but a
-    // *premultiplied* color with rgb=255 and a tiny alpha is invalid data (in
-    // true premultiplied form rgb must be <= alpha), and egui's renderer drew
-    // it as solid white instead of a faint tint. Using a solid dark shade
-    // avoids the whole class of premultiplied-alpha foot-guns.
+
     pub const BG_ROW_ALT: Color32 = Color32::from_rgb(26, 30, 43);
     pub const BG_WIDGET: Color32 = Color32::from_rgb(30, 34, 48);
     pub const BG_WIDGET_HOVER: Color32 = Color32::from_rgb(38, 43, 60);
 
     pub const BORDER: Color32 = Color32::from_rgb(40, 45, 60);
 
-    pub const ACCENT: Color32 = Color32::from_rgb(56, 145, 255); // primary blue
+    pub const ACCENT: Color32 = Color32::from_rgb(56, 145, 255);
     pub const ACCENT_CYAN: Color32 = Color32::from_rgb(94, 212, 230);
     pub const ACCENT_GOLD: Color32 = Color32::from_rgb(255, 196, 60);
 

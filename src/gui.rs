@@ -161,12 +161,12 @@ struct EditOperation {
 }
 
 pub struct MyApp {
-    // File data
+    // File data.
     file_path: Option<PathBuf>,
     file_data: Vec<u8>,
     original_data: Vec<u8>,
 
-    // UI state
+    // UI state.
     selected_offset: usize,
     bytes_per_row: usize,
     show_data_inspector: bool,
@@ -175,35 +175,35 @@ pub struct MyApp {
     show_edit_dialog: bool,
     dark_mode: bool,
 
-    // Search
+    // Search.
     search_query: String,
     search_results: Vec<usize>,
     current_search_index: usize,
 
-    // Edit dialog
+    // Edit dialog.
     edit_line: String,
     edit_offset: String,
     edit_data: String,
 
-    // Go to
+    // Go to.
     go_to_offset: String,
 
-    // Settings
+    // Settings.
     character_encoding: Encoding,
     endianness: Endianness,
 
-    // Undo/Redo
+    // Undo/Redo.
     undo_stack: Vec<EditOperation>,
     redo_stack: Vec<EditOperation>,
     operation_counter: u64,
 
-    // Recent files
+    // Recent files.
     recent_files: Vec<PathBuf>,
 
-    // Bookmarks (byte offsets the user has flagged)
+    // Bookmarks (byte offsets the user has flagged).
     bookmarks: Vec<usize>,
 
-    // Status
+    // Status.
     status_message: String,
     status_color: Color32,
 }
@@ -292,7 +292,7 @@ impl MyApp {
     fn load_file(&mut self, path: PathBuf) {
         match fs::read(&path) {
             Ok(data) => {
-                // Store the path for display after moving
+                // Store the path for display after moving.
                 let path_display = path.display().to_string();
                 self.file_path = Some(path);
                 self.file_data = data.clone();
@@ -302,7 +302,7 @@ impl MyApp {
                 self.selected_offset = 0;
                 self.bookmarks.clear();
 
-                // Add to recent files (clone before moving)
+                // Add to recent files (clone before moving).
                 let path_clone = PathBuf::from(&path_display);
                 if !self.recent_files.contains(&path_clone) {
                     self.recent_files.insert(0, path_clone);
@@ -365,7 +365,7 @@ impl MyApp {
             return;
         }
 
-        // Try to parse as hex first
+        // Try to parse as hex first.
         let query_bytes = if self.search_query.contains(' ') {
             // Try hex bytes
             self.search_query
@@ -373,7 +373,7 @@ impl MyApp {
                 .filter_map(|s| u8::from_str_radix(s, 16).ok())
                 .collect::<Vec<u8>>()
         } else {
-            // Try as ASCII or hex string
+            // Try as ASCII or hex string.
             if self.search_query.starts_with("0x")
                 || self.search_query.chars().all(|c| c.is_ascii_hexdigit())
             {
@@ -422,16 +422,13 @@ impl MyApp {
         self.current_search_index = new_index;
         self.selected_offset = self.search_results[new_index];
     }
-
-    // -------------------------------------------------------------
-    // Rendering
-    // -------------------------------------------------------------
+    // Rendering.
 
     fn render_menu_bar(&mut self, ui: &mut egui::Ui) {
         ui.horizontal(|ui| {
             ui.add_space(4.0);
 
-            // Logo mark
+            // Logo mark.
             let (rect, _resp) = ui.allocate_exact_size(egui::vec2(26.0, 26.0), egui::Sense::hover());
             ui.painter()
                 .rect_filled(rect, Rounding::same(7.0), theme::ACCENT);
@@ -454,7 +451,7 @@ impl MyApp {
             ui.label(RichText::new(title).strong().size(15.0));
             ui.add_space(14.0);
 
-            // File menu
+            // File menu.
             ui.menu_button("File", |ui| {
                 if ui.button("📂  Open").clicked() {
                     if let Some(path) = rfd::FileDialog::new().pick_file() {
@@ -478,7 +475,7 @@ impl MyApp {
                 }
                 ui.separator();
 
-                // Recent files
+                // Recent files.
                 if !self.recent_files.is_empty() {
                     ui.label(RichText::new("Recent Files").color(theme::TEXT_MUTED).small());
                     let recent_files: Vec<PathBuf> = self.recent_files.clone();
@@ -496,7 +493,7 @@ impl MyApp {
                 }
             });
 
-            // Edit menu
+            // Edit menu.
             ui.menu_button("Edit", |ui| {
                 if ui.button("Undo").clicked() {
                     ui.close_menu();
@@ -516,7 +513,7 @@ impl MyApp {
                 }
             });
 
-            // View menu
+            // View menu.
             ui.menu_button("View", |ui| {
                 ui.checkbox(&mut self.show_data_inspector, "Data Inspector");
                 ui.separator();
@@ -525,7 +522,7 @@ impl MyApp {
                 }
             });
 
-            // Search menu
+            // Search menu.
             ui.menu_button("Search", |ui| {
                 if ui.button("Find...").clicked() {
                     self.show_search_dialog = true;
@@ -537,7 +534,7 @@ impl MyApp {
                 }
             });
 
-            // Analyze menu
+            // Analyze menu.
             ui.menu_button("Analyze", |ui| {
                 if ui.button("Find Patterns").clicked() {
                     ui.close_menu();
@@ -547,7 +544,7 @@ impl MyApp {
                 }
             });
 
-            // Tools / Settings menu
+            // Tools / Settings menu.
             ui.menu_button("Tools", |ui| {
                 ui.menu_button("Character Encoding", |ui| {
                     if ui.button("ASCII").clicked() {
@@ -576,7 +573,7 @@ impl MyApp {
                 });
             });
 
-            // Help menu
+            // Help menu.
             ui.menu_button("Help", |ui| {
                 if ui.button("About AtomEX").clicked() {
                     ui.close_menu();
@@ -634,7 +631,7 @@ impl MyApp {
                 }
             });
 
-            // Right-aligned settings / theme controls
+            // Right-aligned settings / theme controls.
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 let theme_label = if self.dark_mode { "🌙  Theme" } else { "☀  Theme" };
                 if ui.button(theme_label).clicked() {
@@ -794,7 +791,7 @@ impl MyApp {
 
         let num_rows = (self.file_data.len() + self.bytes_per_row - 1) / self.bytes_per_row;
 
-        // Header
+        // Header.
         egui::Frame::none()
             .fill(theme::BG_PANEL_ALT)
             .rounding(Rounding::same(6.0))
@@ -830,7 +827,7 @@ impl MyApp {
 
         ui.add_space(4.0);
 
-        // Data rows
+        // Data rows.
         egui::ScrollArea::vertical().show(ui, |ui| {
             for row in 0..num_rows {
                 let offset = row * self.bytes_per_row;
@@ -854,7 +851,7 @@ impl MyApp {
 
                 frame.show(ui, |ui| {
                     ui.horizontal(|ui| {
-                        // Offset
+                        // Offset.
                         let offset_label = RichText::new(format!("{:08X}", offset))
                             .monospace()
                             .color(if row_selected {
@@ -870,7 +867,7 @@ impl MyApp {
                         }
                         ui.add_space(20.0);
 
-                        // Hex bytes
+                        // Hex bytes.
                         for col in 0..self.bytes_per_row {
                             let idx = offset + col;
                             if idx < self.file_data.len() {
@@ -927,7 +924,7 @@ impl MyApp {
 
                         ui.add_space(16.0);
 
-                        // ASCII representation
+                        // ASCII representation.
                         let mut ascii_str = String::new();
                         for col in 0..self.bytes_per_row {
                             let idx = offset + col;
@@ -1256,11 +1253,7 @@ impl MyApp {
                 ui.horizontal(|ui| {
                     ui.label("Offset:");
                     let response = ui.text_edit_singleline(&mut self.go_to_offset);
-                    // Only jump when the user explicitly commits the value
-                    // (presses Enter or clicks "Go") - NOT on every keystroke.
-                    // Triggering on `response.changed()` was jumping to a new
-                    // (wrong) offset after each character typed, e.g. typing
-                    // "7780" would jump to 0x7, then 0x77, then 0x778...
+
                     let enter_pressed = response.lost_focus()
                         && ui.input(|i| i.key_pressed(egui::Key::Enter));
                     if ui.button("Go").clicked() || enter_pressed {
@@ -1431,7 +1424,7 @@ impl eframe::App for MyApp {
                 self.render_hex_grid(ui);
             });
 
-        // Dialogs
+        // Dialogs.
         if self.show_search_dialog {
             self.render_search_dialog(ctx);
         }
